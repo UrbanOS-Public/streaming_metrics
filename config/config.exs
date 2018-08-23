@@ -10,4 +10,4 @@ config :logger,
 config :ex_aws,
   region: "us-east-2"
 
-import_config "#{Mix.env()}.exs"
+import_config "test.exs"

@@ -17,11 +17,20 @@ defmodule AwsMetricCollectorTest do
       assert expected_count == actual_count
     end
 
+    test "Specifies the dimensions" do
+      expected_dimensions = [{Foo, "bar" }]
+
+      %{dimensions: actual_dimensions} =
+        MetricCollector.count_metric(12, @inbound_records, expected_dimensions)
+
+      assert expected_dimensions == actual_dimensions
+    end
+
     test "Specifies the date" do
       expected_timestamp = DateTime.from_iso8601("2018-08-09T13:18:20Z")
 
       %{timestamp: actual_timestamp} =
-        MetricCollector.count_metric(12, @inbound_records, expected_timestamp)
+        MetricCollector.count_metric(12, @inbound_records, [], expected_timestamp)
 
       assert expected_timestamp == actual_timestamp
     end
