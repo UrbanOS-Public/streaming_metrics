@@ -1,0 +1,58 @@
+defmodule StreamingMetrics.AwsMetricCollector do
+  @behaviour MetricCollector
+
+  require Logger
+
+  def init() do
+    set_region_if_running_on_aws()
+    :ok
+  end
+
+  def count_metric(count, name, timestamp \\ DateTime.utc_now()) do
+    %{
+      metric_name: name,
+      value: count,
+      unit: "Count",
+      timestamp: timestamp
+    }
+  end
+
+  def record_metrics(metrics, namespace) do
+    metrics
+    |> ExAws.Cloudwatch.put_metric_data(namespace)
+    |> ExAws.request()
+  end
+
+  defp set_region_if_running_on_aws() do
+    default_region = Application.get_env(:ex_aws, :region)
+
+    case HTTPoison.get("http://169.254.169.254/latest/meta-data/placement/availability-zone/") do
+      {:ok, %HTTPoison.Response{status_code: 200, body: availability_zone}} ->
+        availability_zone
+        |> remove_last_char
+        |> set_aws_region
+
+      {:ok, %HTTPoison.Response{status_code: error_code}} ->
+        Logger.warn(
+          failed_to_obtain_aws_region_message("HTTP Status: #{error_code}", default_region)
+        )
+
+      {:error, reason} ->
+        Logger.warn(
+          failed_to_obtain_aws_region_message("Reason: #{inspect(reason)}", default_region)
+        )
+    end
+  end
+
+  defp set_aws_region(region) do
+    Application.put_env(:ex_aws, :region, region)
+  end
+
+  defp remove_last_char(string) do
+    string |> String.slice(0..-2)
+  end
+
+  defp failed_to_obtain_aws_region_message(message, default_region) do
+    "Failed to obtain AWS region. #{message}. Defaulting to #{default_region}."
+  end
+end
