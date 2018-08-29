@@ -1,5 +1,5 @@
 defmodule StreamingMetrics.AwsMetricCollector do
-  @behaviour MetricCollector
+  @behaviour StreamingMetrics.MetricCollector
 
   require Logger
 
@@ -8,12 +8,13 @@ defmodule StreamingMetrics.AwsMetricCollector do
     :ok
   end
 
-  def count_metric(count, name, timestamp \\ DateTime.utc_now()) do
+  def count_metric(count, name, dimensions \\ [], timestamp \\ DateTime.utc_now()) do
     %{
       metric_name: name,
       value: count,
       unit: "Count",
-      timestamp: timestamp
+      timestamp: timestamp,
+      dimensions: dimensions
     }
   end
 
