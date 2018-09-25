@@ -1,23 +1,20 @@
 library(
-    identifier: 'pipeline-lib@1.3.1',
+    identifier: 'pipeline-lib@4.3.0',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
 )
 
-def image
+properties([
+    pipelineTriggers([scos.dailyBuildTrigger()]),
+])
 
 node ('master') {
     ansiColor('xterm') {
-        stage('Checkout') {
-            deleteDir()
-            env.GIT_COMMIT_HASH = checkout(scm).GIT_COMMIT
-
-            scos.addGitHubRemoteForTagging("SmartColumbusOS/streaming-metrics.git")
-        }
+        scos.doCheckoutStage()
 
         stage ('Build') {
-            image = docker.build("scos/streaming-metrics:${env.GIT_COMMIT_HASH}")
+            docker.build("scos/streaming-metrics:${env.GIT_COMMIT_HASH}")
         }
     }
 }
