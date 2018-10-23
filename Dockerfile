@@ -5,4 +5,5 @@ WORKDIR /app
 RUN mix local.hex --force  && \
     mix local.rebar --force && \
     mix deps.get && \
-    mix test
+    mix test && \
+    mix credo
