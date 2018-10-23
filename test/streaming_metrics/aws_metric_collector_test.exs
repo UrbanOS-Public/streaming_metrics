@@ -18,7 +18,7 @@ defmodule AwsMetricCollectorTest do
     end
 
     test "Specifies the dimensions" do
-      expected_dimensions = [{Foo, "bar" }]
+      expected_dimensions = [{Foo, "bar"}]
 
       %{dimensions: actual_dimensions} =
         MetricCollector.count_metric(12, @inbound_records, expected_dimensions)

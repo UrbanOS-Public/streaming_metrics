@@ -1,4 +1,8 @@
 defmodule StreamingMetrics.MetricCollector do
+  @moduledoc """
+  All modules implementing a MetricCollector must define the callbacks specified in this module.
+  """
+
   @type metric :: term
 
   @callback init() :: :ok | {:error, term}

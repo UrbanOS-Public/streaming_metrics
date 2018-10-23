@@ -1,4 +1,5 @@
 defmodule StreamingMetrics.ConsoleMetricCollector do
+  @moduledoc false
   @behaviour StreamingMetrics.MetricCollector
 
   require Logger
