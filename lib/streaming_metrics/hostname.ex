@@ -1,4 +1,8 @@
 defmodule StreamingMetrics.Hostname do
+  @moduledoc """
+  This module retrieves the node host's hostname.
+  """
+
   use Agent
 
   def start_link(_opts) do

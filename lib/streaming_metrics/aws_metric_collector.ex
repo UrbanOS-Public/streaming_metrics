@@ -1,4 +1,5 @@
 defmodule StreamingMetrics.AwsMetricCollector do
+  @moduledoc false
   @behaviour StreamingMetrics.MetricCollector
 
   require Logger

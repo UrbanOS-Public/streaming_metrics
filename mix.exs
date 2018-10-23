@@ -30,7 +30,8 @@ defmodule StreamingMetrics.MixProject do
       github: "ex-aws/ex_aws_cloudwatch",
       sha: "258c0c2a81acf6acf68439d2e9c4cfdf8dec10eb",
       app: false},
-      {:ex_aws, "~> 2.0.0"}
+      {:ex_aws, "~> 2.0.0"},
+      {:credo, "~> 0.10", only: [:dev, :test], runtime: false}
     ]
   end
 end
