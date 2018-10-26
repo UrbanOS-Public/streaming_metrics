@@ -15,8 +15,7 @@ defmodule StreamingMetrics.MixProject do
   def application do
     [
       mod: {StreamingMetrics, []},
-      extra_applications: [:logger],
-      applications: [:ex_aws_cloudwatch, :ex_aws]
+      extra_applications: [:logger]
     ]
   end
 
@@ -28,8 +27,7 @@ defmodule StreamingMetrics.MixProject do
       # v2.0.3 + metric timestamp fix; HEAD of master on 2018-08-11
       {:ex_aws_cloudwatch,
       github: "ex-aws/ex_aws_cloudwatch",
-      sha: "258c0c2a81acf6acf68439d2e9c4cfdf8dec10eb",
-      app: false},
+      sha: "258c0c2a81acf6acf68439d2e9c4cfdf8dec10eb"},
       {:ex_aws, "~> 2.0.0"},
       {:credo, "~> 0.10", only: [:dev, :test], runtime: false}
     ]
