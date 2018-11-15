@@ -14,4 +14,3 @@ config :ex_aws, :retries,
   max_attempts: 30,
   base_backoff_in_ms: 1_000,
   max_backoff_in_ms: 1_000
-

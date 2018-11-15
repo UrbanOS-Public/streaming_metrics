@@ -13,5 +13,4 @@ defmodule StreamingMetrics.Hostname do
   def get() do
     Agent.get(__MODULE__, fn name -> name end)
   end
-
 end
