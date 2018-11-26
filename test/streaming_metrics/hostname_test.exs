@@ -4,7 +4,7 @@ defmodule StreamingMetrics.HostnameTest do
   @hostname "foobar"
 
   setup_all do
-    Agent.update(StreamingMetrics.Hostname, fn hostname -> @hostname end)
+    Agent.update(StreamingMetrics.Hostname, fn _hostname -> @hostname end)
   end
 
   test "agent gets the correct hostname" do

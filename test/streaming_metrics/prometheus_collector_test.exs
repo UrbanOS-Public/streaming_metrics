@@ -62,7 +62,7 @@ defmodule PrometheusMetricCollectorTest do
         dimensions: []
       }
 
-      {:error, reason} = MetricCollector.record_metrics([metric], "some namespace")
+      {:error, _reason} = MetricCollector.record_metrics([metric], "some namespace")
     end
 
     test "when one metric is okay, but another is not returns {:error, reason}" do
@@ -75,7 +75,7 @@ defmodule PrometheusMetricCollectorTest do
         }
       ]
 
-      {:error, reason} = MetricCollector.record_metrics(metrics, "some namespace")
+      {:error, _reason} = MetricCollector.record_metrics(metrics, "some namespace")
     end
   end
 
