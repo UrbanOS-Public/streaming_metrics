@@ -21,13 +21,13 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
     |> Enum.map(fn metric ->
       :prometheus_gauge.declare(
         name: metric[:metric_name],
-        labels: Keyword.keys(metric[:dimensions]),
+        labels: [:namespace] ++ Keyword.keys(metric[:dimensions]),
         help: ""
       )
     end)
 
     metrics
-    |> Enum.map(&set_gauge/1)
+    |> Enum.map(&set_gauge(&1, namespace))
     |> Enum.reduce(
       {:ok, []},
       fn result, acc ->
@@ -39,11 +39,13 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
     )
   end
 
-  defp set_gauge(metric) do
+  defp set_gauge(metric, namespace) do
     try do
-      labels =
+      dimensions =
         metric[:dimensions]
         |> Keyword.values()
+
+      labels = [namespace] ++ dimensions
 
       :prometheus_gauge.set(metric[:metric_name], labels, metric[:value])
     rescue

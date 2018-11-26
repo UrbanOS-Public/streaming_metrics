@@ -38,21 +38,21 @@ defmodule PrometheusMetricCollectorTest do
   describe("record_metrics") do
     test "returns {:ok, []}", context do
       metric = MetricCollector.count_metric(3, context.metric_name)
-      assert {:ok, []} = MetricCollector.record_metrics([metric], "some namespace")
+      assert {:ok, []} = MetricCollector.record_metrics([metric], "some_namespace")
     end
 
-    test "Prometheus metric is set properly", context do
+    test "Label is created for the namespace", context do
       metric = MetricCollector.count_metric(3, context.metric_name)
-      {:ok, []} = MetricCollector.record_metrics([metric], "some namespace")
+      {:ok, []} = MetricCollector.record_metrics([metric], "some_namespace")
 
-      assert 3 == :prometheus_gauge.value(metric[:metric_name])
+      assert 3 == :prometheus_gauge.value(metric[:metric_name], ["some_namespace"])
     end
 
     test "Uses dimensions as Prometheus labels", context do
       metric = MetricCollector.count_metric(5, context.metric_name, somelabel: "blue")
-      {:ok, []} = MetricCollector.record_metrics([metric], "some namespace")
+      {:ok, []} = MetricCollector.record_metrics([metric], "some_namespace")
 
-      assert 5 == :prometheus_gauge.value(metric[:metric_name], ["blue"])
+      assert 5 == :prometheus_gauge.value(metric[:metric_name], ["some_namespace", "blue"])
     end
 
     test "when value is not a number, returns {:error, reason}" do
@@ -62,7 +62,7 @@ defmodule PrometheusMetricCollectorTest do
         dimensions: []
       }
 
-      {:error, _reason} = MetricCollector.record_metrics([metric], "some namespace")
+      {:error, _reason} = MetricCollector.record_metrics([metric], "some_namespace")
     end
 
     test "when one metric is okay, but another is not returns {:error, reason}" do
@@ -75,7 +75,7 @@ defmodule PrometheusMetricCollectorTest do
         }
       ]
 
-      {:error, _reason} = MetricCollector.record_metrics(metrics, "some namespace")
+      {:error, _reason} = MetricCollector.record_metrics(metrics, "some_namespace")
     end
   end
 
