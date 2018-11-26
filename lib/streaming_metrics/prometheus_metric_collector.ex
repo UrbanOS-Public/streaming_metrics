@@ -41,11 +41,7 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
 
   defp set_gauge(metric, namespace) do
     try do
-      dimensions =
-        metric[:dimensions]
-        |> Keyword.values()
-
-      labels = [namespace] ++ dimensions
+      labels = [namespace] ++ Keyword.values(metric[:dimensions])
 
       :prometheus_gauge.set(metric[:metric_name], labels, metric[:value])
     rescue
