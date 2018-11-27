@@ -20,8 +20,8 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
     metrics
     |> Enum.map(fn metric ->
       :prometheus_gauge.declare(
-        name: metric[:metric_name],
-        labels: [:namespace] ++ Keyword.keys(metric[:dimensions]),
+        name: prometheus_metric_name(namespace, metric[:metric_name]),
+        labels: Keyword.keys(metric[:dimensions]),
         help: ""
       )
     end)
@@ -41,11 +41,16 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
 
   defp set_gauge(metric, namespace) do
     try do
-      labels = [namespace] ++ Keyword.values(metric[:dimensions])
+      metric_name = prometheus_metric_name(namespace, metric[:metric_name])
+      labels = Keyword.values(metric[:dimensions])
 
-      :prometheus_gauge.set(metric[:metric_name], labels, metric[:value])
+      :prometheus_gauge.set(metric_name, labels, metric[:value])
     rescue
       e in ErlangError -> {:error, e}
     end
+  end
+
+  defp prometheus_metric_name(namespace, name) do
+    namespace <> "_" <> name
   end
 end
