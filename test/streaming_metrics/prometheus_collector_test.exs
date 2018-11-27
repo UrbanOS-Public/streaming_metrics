@@ -33,6 +33,15 @@ defmodule PrometheusMetricCollectorTest do
 
       assert expected_dimensions == actual_dimensions
     end
+
+    test "Replaces spaces in name with underscores" do
+      # This is for compatability with prometheus
+      # Prometheus metric names must match the following regex
+      # ^[a-zA-Z_:][a-zA-Z0-9_:]*$
+
+      %{metric_name: name} = MetricCollector.count_metric(1, "Metric Name")
+      assert "Metric_Name" == name
+    end
   end
 
   describe("record_metrics") do

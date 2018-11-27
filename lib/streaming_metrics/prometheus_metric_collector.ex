@@ -10,7 +10,7 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
 
   def count_metric(count, name, dimensions \\ [], _timestamp \\ []) do
     %{
-      metric_name: name,
+      metric_name: String.replace(name, " ", "_"),
       value: count,
       dimensions: dimensions
     }
