@@ -17,11 +17,15 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
   end
 
   def record_metrics(metrics, namespace) do
+    metrics =
+      metrics
+      |> Enum.map(&Map.put(&1, :metric_name, prometheus_metric_name(namespace, &1.metric_name)))
+
     metrics
     |> Enum.map(fn metric ->
       :prometheus_counter.declare(
-        name: prometheus_metric_name(namespace, metric[:metric_name]),
-        labels: Keyword.keys(metric[:dimensions]),
+        name: metric.metric_name,
+        labels: Keyword.keys(metric.dimensions),
         help: ""
       )
     end)
@@ -41,10 +45,8 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
 
   defp increment_counter(metric, namespace) do
     try do
-      metric_name = prometheus_metric_name(namespace, metric[:metric_name])
-      labels = Keyword.values(metric[:dimensions])
-
-      :prometheus_counter.inc(metric_name, labels, metric[:value])
+      labels = Keyword.values(metric.dimensions)
+      :prometheus_counter.inc(metric.metric_name, labels, metric.value)
     rescue
       e in ErlangError -> {:error, e}
     end
