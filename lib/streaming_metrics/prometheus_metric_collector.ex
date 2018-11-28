@@ -32,7 +32,7 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
   @doc """
   Declares Prometheus counter metrics, if it doesn't exist, and increments them.
   Metrics are recorded in Prometheus in the following format.
-  `#{namespace}_#{metric.name}`
+  `{namespace}_{metric.name}`
   Spaces are replaced with underscores for compatibility with Prometheus.
   """
   def record_metrics(metrics, namespace) do
