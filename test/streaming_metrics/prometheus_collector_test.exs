@@ -33,15 +33,6 @@ defmodule PrometheusMetricCollectorTest do
 
       assert expected_dimensions == actual_dimensions
     end
-
-    test "Replaces spaces in name with underscores" do
-      # This is for compatability with prometheus
-      # Prometheus metric names must match the following regex
-      # ^[a-zA-Z_:][a-zA-Z0-9_:]*$
-
-      %{metric_name: name} = MetricCollector.count_metric(1, "Metric Name")
-      assert "Metric_Name" == name
-    end
   end
 
   describe("record_metrics") do
@@ -62,6 +53,24 @@ defmodule PrometheusMetricCollectorTest do
     test "returns {:ok, []}", context do
       metric = MetricCollector.count_metric(3, context.metric_name)
       assert {:ok, []} = MetricCollector.record_metrics([metric], context.namespace)
+    end
+
+    test "Replaces spaces in metric.name with underscores", context do
+      # This is for compatability with prometheus
+      # Prometheus metric names must match the following regex
+      # ^[a-zA-Z_:][a-zA-Z0-9_:]*$
+
+      metric = MetricCollector.count_metric(37, "Metric Name")
+      {:ok, []} = MetricCollector.record_metrics([metric], context.namespace)
+
+      assert 37 == :prometheus_counter.value("some_namespace_Metric_Name")
+    end
+
+    test "Replaces spaces in namespace with underscores", context do
+      metric = MetricCollector.count_metric(42, context.metric_name)
+      {:ok, []} = MetricCollector.record_metrics([metric], "some namespace")
+
+      assert 42 == :prometheus_counter.value(context.prometheus_metric_name)
     end
 
     test "Namespace is prepended to the metric name", context do
