@@ -16,7 +16,7 @@ defmodule PrometheusMetricCollectorTest do
 
   describe("count_metric") do
     test "Has MetricName of 'MetricName'", context do
-      %{metric_name: name} = MetricCollector.count_metric(1, context.metric_name)
+      %{name: name} = MetricCollector.count_metric(1, context.metric_name)
       assert context.metric_name == name
     end
 
@@ -89,7 +89,7 @@ defmodule PrometheusMetricCollectorTest do
 
     test "when value is not a number, returns {:error, reason}", context do
       metric = %{
-        metric_name: "FooCount",
+        name: "FooCount",
         value: :nan,
         dimensions: []
       }
@@ -101,7 +101,7 @@ defmodule PrometheusMetricCollectorTest do
       metrics = [
         MetricCollector.count_metric(3, "FooCount"),
         %{
-          metric_name: "FooCount",
+          name: "FooCount",
           value: :nan,
           dimensions: []
         }

@@ -10,7 +10,7 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
 
   def count_metric(count, name, dimensions \\ [], _timestamp \\ []) do
     %{
-      metric_name: name,
+      name: name,
       value: count,
       dimensions: dimensions
     }
@@ -19,41 +19,40 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
   def record_metrics(metrics, namespace) do
     metrics =
       metrics
-      |> Enum.map(&Map.put(&1, :metric_name, prometheus_metric_name(namespace, &1.metric_name)))
+      |> Enum.map(&Map.put(&1, :name, prometheus_metric_name(namespace, &1.name)))
 
     metrics
-    |> Enum.map(fn metric ->
-      :prometheus_counter.declare(
-        name: metric.metric_name,
-        labels: Keyword.keys(metric.dimensions),
+    |> Enum.each(
+      &:prometheus_counter.declare(
+        name: &1.name,
+        labels: Keyword.keys(&1.dimensions),
         help: ""
       )
-    end)
+    )
 
     metrics
     |> Enum.map(&increment_counter(&1, namespace))
-    |> Enum.reduce(
-      {:ok, []},
-      fn result, acc ->
-        with {:ok, term} <- acc,
-             :ok <- result,
-             do: {:ok, term},
-             else: (err -> err)
-      end
-    )
+    |> Enum.reduce({:ok, []}, &prometheus_to_collector_reducer/2)
+  end
+
+  defp prometheus_metric_name(namespace, name) do
+    (namespace <> "_" <> name)
+    |> String.replace(" ", "_")
   end
 
   defp increment_counter(metric, namespace) do
     try do
       labels = Keyword.values(metric.dimensions)
-      :prometheus_counter.inc(metric.metric_name, labels, metric.value)
+      :prometheus_counter.inc(metric.name, labels, metric.value)
     rescue
       e in ErlangError -> {:error, e}
     end
   end
 
-  defp prometheus_metric_name(namespace, name) do
-    namespace <> "_" <> name
-    |> String.replace(" ", "_")
+  defp prometheus_to_collector_reducer(result, acc) do
+    # Translates prometheus results to StreamingMetrics.MetricCollector results
+    with {:ok, term} <- acc,
+         :ok <- result,
+         do: {:ok, term}
   end
 end
