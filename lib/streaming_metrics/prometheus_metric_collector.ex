@@ -19,7 +19,7 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
   def record_metrics(metrics, namespace) do
     metrics
     |> Enum.map(fn metric ->
-      :prometheus_gauge.declare(
+      :prometheus_counter.declare(
         name: prometheus_metric_name(namespace, metric[:metric_name]),
         labels: Keyword.keys(metric[:dimensions]),
         help: ""
@@ -27,7 +27,7 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
     end)
 
     metrics
-    |> Enum.map(&set_gauge(&1, namespace))
+    |> Enum.map(&increment_counter(&1, namespace))
     |> Enum.reduce(
       {:ok, []},
       fn result, acc ->
@@ -39,12 +39,12 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
     )
   end
 
-  defp set_gauge(metric, namespace) do
+  defp increment_counter(metric, namespace) do
     try do
       metric_name = prometheus_metric_name(namespace, metric[:metric_name])
       labels = Keyword.values(metric[:dimensions])
 
-      :prometheus_gauge.set(metric_name, labels, metric[:value])
+      :prometheus_counter.inc(metric_name, labels, metric[:value])
     rescue
       e in ErlangError -> {:error, e}
     end

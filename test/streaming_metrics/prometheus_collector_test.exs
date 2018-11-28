@@ -8,7 +8,7 @@ defmodule PrometheusMetricCollectorTest do
     metric_name = "MetricName"
 
     on_exit(fn ->
-      :prometheus_gauge.deregister(metric_name)
+      :prometheus_counter.deregister(metric_name)
     end)
 
     [metric_name: metric_name]
@@ -50,7 +50,7 @@ defmodule PrometheusMetricCollectorTest do
       metric_name = namespace <> "_" <> context.metric_name
 
       on_exit(fn ->
-        :prometheus_gauge.deregister(metric_name)
+        :prometheus_counter.deregister(metric_name)
       end)
 
       [
@@ -68,14 +68,14 @@ defmodule PrometheusMetricCollectorTest do
       metric = MetricCollector.count_metric(3, context.metric_name)
       {:ok, []} = MetricCollector.record_metrics([metric], context.namespace)
 
-      assert 3 == :prometheus_gauge.value(context.prometheus_metric_name)
+      assert 3 == :prometheus_counter.value(context.prometheus_metric_name)
     end
 
     test "Uses dimensions as Prometheus labels", context do
       metric = MetricCollector.count_metric(5, context.metric_name, somelabel: "blue")
       {:ok, []} = MetricCollector.record_metrics([metric], context.namespace)
 
-      assert 5 == :prometheus_gauge.value(context.prometheus_metric_name, ["blue"])
+      assert 5 == :prometheus_counter.value(context.prometheus_metric_name, ["blue"])
     end
 
     test "when value is not a number, returns {:error, reason}", context do
