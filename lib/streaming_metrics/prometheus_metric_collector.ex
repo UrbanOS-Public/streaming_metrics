@@ -1,13 +1,26 @@
 defmodule StreamingMetrics.PrometheusMetricCollector do
-  @moduledoc false
+  @moduledoc """
+  Prometheus backend.
+
+  It is the client's responsibility to expose the metrics
+  to prometheus via a scrape endpoint or the Pushgateway.
+  This module simply creates and increments the counters.
+  """
   @behaviour StreamingMetrics.MetricCollector
 
   require Logger
 
+  @doc """
+  Always returns `:ok`
+  """
   def init() do
     :ok
   end
 
+  @doc """
+  Formats info into a format `record_metrics` understands.
+  `timestamp` is ignored because Prometheus handles timestamps.
+  """
   def count_metric(count, name, dimensions \\ [], _timestamp \\ []) do
     %{
       name: name,
@@ -16,6 +29,12 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
     }
   end
 
+  @doc """
+  Declares Prometheus counter metrics, if it doesn't exist, and increments them.
+  Metrics are recorded in Prometheus in the following format.
+  `#{namespace}_#{metric.name}`
+  Spaces are replaced with underscores for compatibility with Prometheus.
+  """
   def record_metrics(metrics, namespace) do
     metrics =
       metrics
