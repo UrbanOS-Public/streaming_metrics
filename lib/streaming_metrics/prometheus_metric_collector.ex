@@ -36,24 +36,21 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
   Spaces are replaced with underscores for compatibility with Prometheus.
   """
   def record_metrics(metrics, namespace) do
-    metrics =
-      metrics
-      |> Enum.map(fn metric ->
-        Map.put(metric, :name, prometheus_metric_name(namespace, metric.name))
-      end)
-
     metrics
-    |> Enum.each(
-      &:prometheus_counter.declare(
-        name: &1.name,
-        labels: Keyword.keys(&1.dimensions),
-        help: ""
-      )
+    |> Enum.map(fn metric -> record_metric(metric, namespace) end)
+    |> Enum.reduce({:ok, []}, &prometheus_to_collector_reducer/2)
+  end
+
+  defp record_metric(metric, namespace) do
+    prometheus_metric = Map.put(metric, :name, prometheus_metric_name(namespace, metric.name))
+
+    :prometheus_counter.declare(
+      name: prometheus_metric.name,
+      labels: Keyword.keys(prometheus_metric.dimensions),
+      help: ""
     )
 
-    metrics
-    |> Enum.map(&increment_counter/1)
-    |> Enum.reduce({:ok, []}, &prometheus_to_collector_reducer/2)
+    increment_counter(prometheus_metric)
   end
 
   defp prometheus_metric_name(namespace, name) do
@@ -78,8 +75,7 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
     {:error, reason}
   end
 
-  defp prometheus_to_collector_reducer(result, acc) do
+  defp prometheus_to_collector_reducer(_result, acc) do
     acc
   end
-
 end
