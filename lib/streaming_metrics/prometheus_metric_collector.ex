@@ -52,7 +52,7 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
     )
 
     metrics
-    |> Enum.map(&increment_counter(&1, namespace))
+    |> Enum.map(&increment_counter/1)
     |> Enum.reduce({:ok, []}, &prometheus_to_collector_reducer/2)
   end
 
@@ -61,7 +61,7 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
     |> String.replace(" ", "_")
   end
 
-  defp increment_counter(metric, namespace) do
+  defp increment_counter(metric) do
     try do
       labels = Keyword.values(metric.dimensions)
       :prometheus_counter.inc(metric.name, labels, metric.value)
