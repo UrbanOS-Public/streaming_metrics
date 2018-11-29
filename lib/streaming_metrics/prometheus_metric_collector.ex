@@ -70,10 +70,16 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
     end
   end
 
-  defp prometheus_to_collector_reducer(result, acc) do
-    # Translates prometheus results to StreamingMetrics.MetricCollector results
-    with {:ok, term} <- acc,
-         :ok <- result,
-         do: {:ok, term}
+  defp prometheus_to_collector_reducer(:ok, {:ok, term}) do
+    {:ok, term}
   end
+
+  defp prometheus_to_collector_reducer({:error, reason}, _acc) do
+    {:error, reason}
+  end
+
+  defp prometheus_to_collector_reducer(result, acc) do
+    acc
+  end
+
 end
