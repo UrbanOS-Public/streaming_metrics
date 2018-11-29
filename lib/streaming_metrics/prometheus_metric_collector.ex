@@ -38,7 +38,9 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
   def record_metrics(metrics, namespace) do
     metrics =
       metrics
-      |> Enum.map(&Map.put(&1, :name, prometheus_metric_name(namespace, &1.name)))
+      |> Enum.map(fn metric ->
+        Map.put(metric, :name, prometheus_metric_name(namespace, metric.name))
+      end)
 
     metrics
     |> Enum.each(
