@@ -14,4 +14,3 @@ defmodule ConsoleMetricCollectorTest do
     end
   end
 end
-

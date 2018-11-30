@@ -3,7 +3,7 @@ defmodule StreamingMetrics do
   use Application
 
   def start(_type, _args) do
-    Application.get_env(:streaming_metrics, :collector, StreamingMetrics.ConsoleMetricCollector).init()  
+    Application.get_env(:streaming_metrics, :collector, StreamingMetrics.ConsoleMetricCollector).init()
 
     children = [
       StreamingMetrics.Hostname
