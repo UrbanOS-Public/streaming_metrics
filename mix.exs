@@ -22,7 +22,7 @@ defmodule StreamingMetrics.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:httpoison, "~> 0.11.1"},
+      {:httpoison, "~> 1.5.0"},
       {:mock, "~> 0.3.1", only: :test, runtime: false},
       # v2.0.3 + metric timestamp fix; HEAD of master on 2018-08-11
       {:ex_aws_cloudwatch,
