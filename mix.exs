@@ -4,10 +4,13 @@ defmodule StreamingMetrics.MixProject do
   def project do
     [
       app: :streaming_metrics,
-      version: "0.2.0",
+      version: "2.1.2",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      description: description(),
+      package: package(),
+      source_url: "https://github.com/SmartColumbusOS"
     ]
   end
 
@@ -30,6 +33,20 @@ defmodule StreamingMetrics.MixProject do
       {:ex_aws, "~> 2.0.0"},
       {:prometheus_ex, "~> 3.0"},
       {:credo, "~> 0.10", only: [:dev, :test], runtime: false}
+    ]
+  end
+
+  defp description do
+    "A metrics recording library"
+  end
+
+  defp package do
+    [
+      organization: "smartcolumbus_os",
+      licenses: ["AllRightsReserved"],
+      links: %{
+        "GitHub" => "https://github.com/SmartColumbusOS/streaming-metrics"
+      }
     ]
   end
 end
