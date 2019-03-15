@@ -4,7 +4,7 @@ defmodule StreamingMetrics.MixProject do
   def project do
     [
       app: :streaming_metrics,
-      version: "2.1.1",
+      version: "2.1.2",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
