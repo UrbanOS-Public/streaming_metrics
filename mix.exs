@@ -5,7 +5,7 @@ defmodule StreamingMetrics.MixProject do
     [
       app: :streaming_metrics,
       version: "2.1.4",
-      elixir: "~> 1.6",
+      elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: description(),
@@ -14,7 +14,6 @@ defmodule StreamingMetrics.MixProject do
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       mod: {StreamingMetrics, []},
@@ -22,15 +21,15 @@ defmodule StreamingMetrics.MixProject do
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:credo, "~> 0.10", only: [:dev, :test], runtime: false},
+      {:ex_aws, "~> 2.1.0"},
+      {:ex_aws_cloudwatch, "~> 2.0.4"},
+      {:ex_doc, "~> 0.19", only: :dev},
       {:httpoison, "~> 1.5.0"},
       {:mock, "~> 0.3.1", only: :test, runtime: false},
-      {:ex_aws_cloudwatch, "~> 2.0.4"},
-      {:ex_aws, "~> 2.0.0"},
-      {:prometheus_ex, "~> 3.0"},
-      {:credo, "~> 0.10", only: [:dev, :test], runtime: false}
+      {:prometheus_ex, "~> 3.0"}
     ]
   end
 
