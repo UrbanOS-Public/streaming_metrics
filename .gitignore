@@ -27,3 +27,5 @@ streamingmetrics-*.tar
 
 #Ignore tool versions
 .tool-versions
+
+.elixir_ls/

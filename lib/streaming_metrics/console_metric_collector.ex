@@ -1,15 +1,17 @@
 defmodule StreamingMetrics.ConsoleMetricCollector do
-  @moduledoc false
+  @moduledoc """
+  A module for collecting metrics and logging to the console.
+  """
   @behaviour StreamingMetrics.MetricCollector
 
   require Logger
 
   def init(), do: :ok
 
+  @doc """
+  Create the metrics that will later be logged to the console
+  """
   def count_metric(count, name, dimensions \\ [], timestamp \\ DateTime.utc_now()) do
-    # Stealing the AWS implementation for convenience,
-    # but other MetricCollectors (grafana, google cloud, etc.)
-    # are likely to require a different data structure.
     %{
       metric_name: name,
       value: count,
@@ -19,6 +21,9 @@ defmodule StreamingMetrics.ConsoleMetricCollector do
     }
   end
 
+  @doc """
+  Simply log the metrics to the console
+  """
   def record_metrics(metrics, namespace) do
     wrapper = %{
       namespace: namespace,

@@ -10,9 +10,6 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
 
   require Logger
 
-  @doc """
-  Always returns `:ok`
-  """
   def init() do
     :ok
   end
