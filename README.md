@@ -1,5 +1,5 @@
-[![Master](https://travis-ci.org/smartcitiesdata/streaming_metrics.svg?branch=master)](https://travis-ci.org/smartcitiesdata/streaming_metrics)
-[![Hex.pm Version](http://img.shields.io/hexpm/v/streaming_metrics.svg?style=flat)](https://hex.pm/packages/streaming_metrics)
+[![Master](https://travis-ci.org/smartcitiesdata/streaming-metrics.svg?branch=master)](https://travis-ci.org/smartcitiesdata/streaming-metrics)
+[![Hex.pm Version](http://img.shields.io/hexpm/v/streaming-metrics.svg?style=flat)](https://hex.pm/packages/streaming-metrics)
 
 # Steaming Metrics
 
@@ -14,7 +14,7 @@ To add to your mix dependencies, add the following block to your mix.exs deps:
 ```elixir
 def deps do
   [
-    {:streaming_metrics, "~> #.#.#"}
+    {:streaming_metrics, "~> 2.1.5"}
   ]
 end
 ```
