@@ -1,5 +1,7 @@
 defmodule StreamingMetrics.AwsMetricCollector do
-  @moduledoc false
+  @moduledoc """
+  A module for collecting metrics and sending them to AWS Cloudwatch.
+  """
   @behaviour StreamingMetrics.MetricCollector
 
   require Logger
@@ -9,6 +11,9 @@ defmodule StreamingMetrics.AwsMetricCollector do
     :ok
   end
 
+  @doc """
+  Create the metrics that will later be sent to AWS Cloudwatch.
+  """
   def count_metric(count, name, dimensions \\ [], timestamp \\ DateTime.utc_now()) do
     %{
       metric_name: name,
@@ -19,6 +24,9 @@ defmodule StreamingMetrics.AwsMetricCollector do
     }
   end
 
+  @doc """
+  Persist metrics to AWS Cloudwatch
+  """
   def record_metrics(metrics, namespace) do
     metrics
     |> ExAws.Cloudwatch.put_metric_data(namespace)
