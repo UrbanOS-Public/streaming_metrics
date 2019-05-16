@@ -10,7 +10,7 @@ defmodule StreamingMetrics.MixProject do
       deps: deps(),
       description: description(),
       package: package(),
-      source_url: "https://github.com/smartcitiesdata/streaming-metrics"
+      source_url: "https://github.com/smartcitiesdata/streaming_metrics"
     ]
   end
 
@@ -40,9 +40,9 @@ defmodule StreamingMetrics.MixProject do
   defp package do
     [
       maintainers: ["smartcitiesdata"],
-      licenses: ["AllRightsReserved"],
+      licenses: ["Apache 2.0"],
       links: %{
-        "GitHub" => "https://github.com/smartcitiesdata/streaming-metrics"
+        "GitHub" => "https://github.com/smartcitiesdata/streaming_metrics"
       }
     ]
   end
