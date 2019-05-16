@@ -14,7 +14,7 @@ To add to your mix dependencies, add the following block to your mix.exs deps:
 ```elixir
 def deps do
   [
-    {:streaming_metrics, "~> 2.1.6"}
+    {:streaming_metrics, "~> 2.1.7"}
   ]
 end
 ```
