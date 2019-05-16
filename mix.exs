@@ -4,13 +4,13 @@ defmodule StreamingMetrics.MixProject do
   def project do
     [
       app: :streaming_metrics,
-      version: "2.1.5",
+      version: "2.1.6",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: description(),
       package: package(),
-      source_url: "https://github.com/SmartColumbusOS"
+      source_url: "https://github.com/smartcitiesdata/streaming-metrics"
     ]
   end
 
@@ -39,10 +39,10 @@ defmodule StreamingMetrics.MixProject do
 
   defp package do
     [
-      organization: "smartcolumbus_os",
+      maintainers: ["smartcitiesdata"],
       licenses: ["AllRightsReserved"],
       links: %{
-        "GitHub" => "https://github.com/SmartColumbusOS/streaming-metrics"
+        "GitHub" => "https://github.com/smartcitiesdata/streaming-metrics"
       }
     ]
   end
