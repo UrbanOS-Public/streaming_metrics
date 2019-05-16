@@ -4,10 +4,11 @@ defmodule StreamingMetrics.MixProject do
   def project do
     [
       app: :streaming_metrics,
-      version: "2.1.6",
+      version: "2.1.7",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      docs: docs(),
       description: description(),
       package: package(),
       source_url: "https://github.com/smartcitiesdata/streaming_metrics"
@@ -44,6 +45,16 @@ defmodule StreamingMetrics.MixProject do
       links: %{
         "GitHub" => "https://github.com/smartcitiesdata/streaming_metrics"
       }
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      source_url: "https://www.github.com/smartcitiesdata/streaming_metrics",
+      extras: [
+        "README.md"
+      ]
     ]
   end
 end
