@@ -1,5 +1,5 @@
 [![Master](https://travis-ci.org/smartcitiesdata/streaming-metrics.svg?branch=master)](https://travis-ci.org/smartcitiesdata/streaming-metrics)
-[![Hex.pm Version](http://img.shields.io/hexpm/v/streaming-metrics.svg?style=flat)](https://hex.pm/packages/streaming-metrics)
+[![Hex.pm Version](http://img.shields.io/hexpm/v/streaming_metrics.svg?style=flat)](https://hex.pm/packages/streaming_metrics)
 
 # Steaming Metrics
 
