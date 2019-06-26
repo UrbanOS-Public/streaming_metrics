@@ -24,7 +24,7 @@ defmodule StreamingMetrics.MixProject do
 
   defp deps do
     [
-      {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
+      {:credo, "~> 0.10", only: [:dev, :test], runtime: false},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_cloudwatch, "~> 2.0"},
       {:ex_doc, "~> 0.19", only: :dev},
