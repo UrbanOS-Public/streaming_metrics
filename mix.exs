@@ -4,7 +4,7 @@ defmodule StreamingMetrics.MixProject do
   def project do
     [
       app: :streaming_metrics,
-      version: "2.1.7",
+      version: "2.1.8",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -27,10 +27,11 @@ defmodule StreamingMetrics.MixProject do
       {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_cloudwatch, "~> 2.0"},
-      {:ex_doc, "~> 0.19", only: :dev},
+      {:ex_doc, "~> 0.20", only: :dev},
       {:httpoison, "~> 1.5"},
       {:mock, "~> 0.3", only: :test, runtime: false},
-      {:prometheus_ex, "~> 3.0"}
+      {:prometheus_ex, "~> 3.0"},
+      {:husky, "~> 1.0", only: :dev, runtime: false}
     ]
   end
 
