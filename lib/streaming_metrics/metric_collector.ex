@@ -4,9 +4,13 @@ defmodule StreamingMetrics.MetricCollector do
   """
 
   @type metric :: term
+  @type metric_name :: String.t()
+  @type dimensions :: keyword(String.t())
+  @type unit :: String.t()
+  @type namespace :: String.t()
 
   @callback init() :: :ok | {:error, term}
-  @callback count_metric(integer, String.t(), [{String.t(), String.t()}], DateTime.t()) :: metric
-  @callback gauge_metric(number, String.t(), [{String.t(), String.t()}], DateTime.t()) :: metric
-  @callback record_metrics([metric], String.t()) :: {:ok, term} | {:error, term}
+  @callback count_metric(integer, metric_name, dimensions, DateTime.t()) :: metric
+  @callback gauge_metric(number, metric_name, dimensions, unit, DateTime.t()) :: metric
+  @callback record_metrics([metric], namespace) :: {:ok, term} | {:error, term}
 end

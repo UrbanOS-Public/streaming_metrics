@@ -11,11 +11,22 @@ defmodule StreamingMetrics.ConsoleMetricCollector do
   @doc """
   Create the metrics that will later be logged to the console
   """
-  def count_metric(count, name, dimensions \\ [], timestamp \\ DateTime.utc_now()) do
+  def count_metric(value, name, dimensions \\ [], timestamp \\ DateTime.utc_now()) do
+    format_metric(value, name, dimensions, "Count", timestamp)
+  end
+
+  @doc """
+  Create the metrics that will later be logged to the console
+  """
+  def gauge_metric(value, name, dimensions \\ [], unit \\ "None", timestamp \\ DateTime.utc_now()) do
+    format_metric(value, name, dimensions, unit, timestamp)
+  end
+
+  defp format_metric(value, name, dimensions, unit, timestamp) do
     %{
       metric_name: name,
-      value: count,
-      unit: "Count",
+      value: value,
+      unit: unit,
       timestamp: timestamp,
       dimensions: dimensions
     }

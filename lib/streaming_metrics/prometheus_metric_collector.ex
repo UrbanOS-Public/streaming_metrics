@@ -25,9 +25,10 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
 
   @doc """
   Formats info into a format `record_metrics` understands.
+  `unit` is ignored because Prometheus prefers that you incorporate the unit name into the metric name.
   `timestamp` is ignored because Prometheus handles timestamps.
   """
-  def gauge_metric(value, name, dimensions \\ [], _timestamp \\ []) do
+  def gauge_metric(value, name, dimensions \\ [], _unit \\ nil, _timestamp \\ []) do
     format_metric(value, name, dimensions, :gauge)
   end
 
