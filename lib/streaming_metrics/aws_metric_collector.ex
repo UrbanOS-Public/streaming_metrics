@@ -54,10 +54,14 @@ defmodule StreamingMetrics.AwsMetricCollector do
         |> set_aws_region
 
       {:ok, %HTTPoison.Response{status_code: error_code}} ->
-        Logger.warn(failed_to_obtain_aws_region_message("HTTP Status: #{error_code}", default_region))
+        Logger.warn(
+          failed_to_obtain_aws_region_message("HTTP Status: #{error_code}", default_region)
+        )
 
       {:error, reason} ->
-        Logger.warn(failed_to_obtain_aws_region_message("Reason: #{inspect(reason)}", default_region))
+        Logger.warn(
+          failed_to_obtain_aws_region_message("Reason: #{inspect(reason)}", default_region)
+        )
     end
   end
 
