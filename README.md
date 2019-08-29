@@ -14,7 +14,7 @@ To add to your mix dependencies, add the following block to your mix.exs deps:
 ```elixir
 def deps do
   [
-    {:streaming_metrics, "~> 2.1.9"}
+    {:streaming_metrics, "~> 2.2.0"}
   ]
 end
 ```
@@ -40,10 +40,11 @@ config :my_app,
   metric_collector: StreamingMetrics.AwsMetricCollector
 ```
 
-Each collector implementation has two functions: 
+Each collector implementation has three functions:
 
 - `record_metrics/2` takes an array of metrics and a namespace.
- - `count_metrics/3` takes an integer, a namespace, an optional array of dimensions (ex: `[{"DimensionName", "some dimension value"}]`), and an optional timestamp.
+ - `count_metric/4` takes an integer, a namespace, an optional array of dimensions (ex: `[{"DimensionName", "some dimension value"}]`), and an optional timestamp.
+ - `gauge_metric/5` takes an integer, a namespace, an optional array of dimensions (ex: `[{"DimensionName", "some dimension value"}]`), an optional unit type (see [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDatum.html)), and an optional timestamp.
 
  ## License
 
