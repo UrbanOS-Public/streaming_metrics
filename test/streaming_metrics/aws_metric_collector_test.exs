@@ -41,6 +41,42 @@ defmodule AwsMetricCollectorTest do
     end
   end
 
+  describe("gauge_metric") do
+    test "returns the expected mapped values" do
+      expected_timestamp = DateTime.from_iso8601("2018-08-09T13:18:20Z")
+      expected_dimensions = [{Foo, "bar"}]
+      expected_unit = "Pies"
+
+      actual =
+        MetricCollector.gauge_metric(
+          12,
+          @inbound_records,
+          expected_dimensions,
+          expected_unit,
+          expected_timestamp
+        )
+
+      expected = %{
+        metric_name: @inbound_records,
+        value: 12,
+        unit: expected_unit,
+        timestamp: expected_timestamp,
+        dimensions: expected_dimensions
+      }
+
+      assert expected == actual
+    end
+
+    test "provides reasonable defaults" do
+      %{unit: unit, timestamp: timestamp, dimensions: dimensions} =
+        MetricCollector.gauge_metric(12, @inbound_records)
+
+      assert "None" == unit
+      assert %DateTime{} = timestamp
+      assert [] == dimensions
+    end
+  end
+
   describe "record_metrics" do
     test "returns {:ok, ExAws.request_result}" do
       response = {

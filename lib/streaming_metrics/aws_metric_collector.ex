@@ -15,10 +15,21 @@ defmodule StreamingMetrics.AwsMetricCollector do
   Create the metrics that will later be sent to AWS Cloudwatch.
   """
   def count_metric(count, name, dimensions \\ [], timestamp \\ DateTime.utc_now()) do
+    format_metric(count, name, dimensions, "Count", timestamp)
+  end
+
+  @doc """
+  Create the metrics that will later be sent to AWS Cloudwatch.
+  """
+  def gauge_metric(value, name, dimensions \\ [], unit \\ "None", timestamp \\ DateTime.utc_now()) do
+    format_metric(value, name, dimensions, unit, timestamp)
+  end
+
+  defp format_metric(value, name, dimensions, unit, timestamp) do
     %{
       metric_name: name,
-      value: count,
-      unit: "Count",
+      value: value,
+      unit: unit,
       timestamp: timestamp,
       dimensions: dimensions
     }

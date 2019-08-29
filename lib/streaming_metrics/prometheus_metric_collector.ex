@@ -9,6 +9,7 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
   @behaviour StreamingMetrics.MetricCollector
 
   require Logger
+  use Prometheus.Metric
 
   def init() do
     :ok
@@ -19,15 +20,29 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
   `timestamp` is ignored because Prometheus handles timestamps.
   """
   def count_metric(count, name, dimensions \\ [], _timestamp \\ []) do
+    format_metric(count, name, dimensions, :count)
+  end
+
+  @doc """
+  Formats info into a format `record_metrics` understands.
+  `unit` is ignored because Prometheus prefers that you incorporate the unit name into the metric name.
+  `timestamp` is ignored because Prometheus handles timestamps.
+  """
+  def gauge_metric(value, name, dimensions \\ [], _unit \\ nil, _timestamp \\ []) do
+    format_metric(value, name, dimensions, :gauge)
+  end
+
+  defp format_metric(value, name, dimensions, type) do
     %{
       name: name,
-      value: count,
-      dimensions: dimensions
+      value: value,
+      dimensions: dimensions,
+      type: type
     }
   end
 
   @doc """
-  Declares Prometheus counter metrics, if it doesn't exist, and increments them.
+  Declares Prometheus metrics, if they doesn't exist, and records them for the provided type.
   Metrics are recorded in Prometheus in the following format.
   `{namespace}_{metric.name}`
   Spaces are replaced with underscores for compatibility with Prometheus.
@@ -38,16 +53,27 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
     |> Enum.reduce({:ok, []}, &prometheus_to_collector_reducer/2)
   end
 
-  defp record_metric(metric, namespace) do
-    prometheus_metric = Map.put(metric, :name, prometheus_metric_name(namespace, metric.name))
+  defp record_metric(%{type: :count} = metric, namespace) do
+    record_metric(metric, namespace, Counter, :inc)
+  end
 
-    :prometheus_counter.declare(
-      name: prometheus_metric.name,
-      labels: Keyword.keys(prometheus_metric.dimensions),
-      help: ""
-    )
+  defp record_metric(%{type: :gauge} = metric, namespace) do
+    record_metric(metric, namespace, Gauge, :set)
+  end
 
-    increment_counter(prometheus_metric)
+  defp record_metric(metric, namespace, prometheus_module, prometheus_func) do
+    prometheus_metric_name = prometheus_metric_name(namespace, metric.name)
+
+    declare_metric(prometheus_metric_name, metric.dimensions, prometheus_module)
+
+    try do
+      apply(prometheus_module, prometheus_func, [
+        [name: prometheus_metric_name, labels: Keyword.values(metric.dimensions)],
+        metric.value
+      ])
+    rescue
+      e -> {:error, e}
+    end
   end
 
   defp prometheus_metric_name(namespace, name) do
@@ -55,13 +81,8 @@ defmodule StreamingMetrics.PrometheusMetricCollector do
     |> String.replace(" ", "_")
   end
 
-  defp increment_counter(metric) do
-    try do
-      labels = Keyword.values(metric.dimensions)
-      :prometheus_counter.inc(metric.name, labels, metric.value)
-    rescue
-      e in ErlangError -> {:error, e}
-    end
+  defp declare_metric(name, dimensions, prometheus_module) do
+    apply(prometheus_module, :declare, [[name: name, labels: Keyword.keys(dimensions), help: ""]])
   end
 
   defp prometheus_to_collector_reducer(:ok, {:ok, term}) do

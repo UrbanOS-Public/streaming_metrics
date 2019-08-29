@@ -1,17 +1,26 @@
 defmodule PrometheusMetricCollectorTest do
   use ExUnit.Case
   require Logger
+  use Prometheus.Metric
 
   alias StreamingMetrics.PrometheusMetricCollector, as: MetricCollector
 
   setup do
+    namespace = "some_namespace"
     metric_name = "MetricName"
+    metric_dimensions = [foo: "bar"]
+    prometheus_metric_name = namespace <> "_" <> metric_name
 
     on_exit(fn ->
-      :prometheus_counter.deregister(metric_name)
+      Prometheus.Registry.clear()
     end)
 
-    [metric_name: metric_name]
+    [
+      namespace: namespace,
+      metric_name: metric_name,
+      metric_dimensions: metric_dimensions,
+      prometheus_metric_name: prometheus_metric_name
+    ]
   end
 
   describe("count_metric") do
@@ -26,30 +35,43 @@ defmodule PrometheusMetricCollectorTest do
     end
 
     test "Specifies the dimensions", context do
-      expected_dimensions = [foo: "bar"]
-
       %{dimensions: actual_dimensions} =
-        MetricCollector.count_metric(12, context.metric_name, expected_dimensions)
+        MetricCollector.count_metric(12, context.metric_name, context.metric_dimensions)
 
-      assert expected_dimensions == actual_dimensions
+      assert context.metric_dimensions == actual_dimensions
+    end
+
+    test "has the correct type", context do
+      %{type: type} = MetricCollector.count_metric(1, context.metric_name)
+      assert :count == type
+    end
+  end
+
+  describe("gauge_metric") do
+    test "has the expected metric name", context do
+      %{name: name} = MetricCollector.gauge_metric(1, context.metric_name)
+      assert context.metric_name == name
+    end
+
+    test "has the expected gauge value", context do
+      %{value: value} = MetricCollector.gauge_metric(42, context.metric_name)
+      assert 42 == value
+    end
+
+    test "has the expected dimensions", context do
+      %{dimensions: actual_dimensions} =
+        MetricCollector.gauge_metric(12, context.metric_name, context.metric_dimensions)
+
+      assert context.metric_dimensions == actual_dimensions
+    end
+
+    test "has the correct type", context do
+      %{type: type} = MetricCollector.gauge_metric(1, context.metric_name)
+      assert :gauge == type
     end
   end
 
   describe("record_metrics") do
-    setup context do
-      namespace = "some_namespace"
-      metric_name = namespace <> "_" <> context.metric_name
-
-      on_exit(fn ->
-        :prometheus_counter.deregister(metric_name)
-      end)
-
-      [
-        namespace: namespace,
-        prometheus_metric_name: metric_name
-      ]
-    end
-
     test "returns {:ok, []}", context do
       metric = MetricCollector.count_metric(3, context.metric_name)
       assert {:ok, []} = MetricCollector.record_metrics([metric], context.namespace)
@@ -63,36 +85,32 @@ defmodule PrometheusMetricCollectorTest do
       metric = MetricCollector.count_metric(37, "Metric Name")
       {:ok, []} = MetricCollector.record_metrics([metric], context.namespace)
 
-      assert 37 == :prometheus_counter.value("some_namespace_Metric_Name")
+      assert 37 == Counter.value(name: "some_namespace_Metric_Name")
     end
 
     test "Replaces spaces in namespace with underscores", context do
       metric = MetricCollector.count_metric(42, context.metric_name)
       {:ok, []} = MetricCollector.record_metrics([metric], "some namespace")
 
-      assert 42 == :prometheus_counter.value(context.prometheus_metric_name)
+      assert 42 == Counter.value(name: context.prometheus_metric_name)
     end
 
     test "Namespace is prepended to the metric name", context do
       metric = MetricCollector.count_metric(3, context.metric_name)
       {:ok, []} = MetricCollector.record_metrics([metric], context.namespace)
 
-      assert 3 == :prometheus_counter.value(context.prometheus_metric_name)
+      assert 3 == Counter.value(name: context.prometheus_metric_name)
     end
 
     test "Uses dimensions as Prometheus labels", context do
       metric = MetricCollector.count_metric(5, context.metric_name, somelabel: "blue")
       {:ok, []} = MetricCollector.record_metrics([metric], context.namespace)
 
-      assert 5 == :prometheus_counter.value(context.prometheus_metric_name, ["blue"])
+      assert 5 == Counter.value(name: context.prometheus_metric_name, labels: ["blue"])
     end
 
     test "when value is not a number, returns {:error, reason}", context do
-      metric = %{
-        name: "FooCount",
-        value: :nan,
-        dimensions: []
-      }
+      metric = MetricCollector.count_metric(:nan, context.metric_name)
 
       {:error, _reason} = MetricCollector.record_metrics([metric], context.namespace)
     end
@@ -100,14 +118,45 @@ defmodule PrometheusMetricCollectorTest do
     test "when one metric is okay, but another is not returns {:error, reason}", context do
       metrics = [
         MetricCollector.count_metric(3, "FooCount"),
-        %{
-          name: "FooCount",
-          value: :nan,
-          dimensions: []
-        }
+        MetricCollector.count_metric(:nan, "FooCount")
       ]
 
       {:error, _reason} = MetricCollector.record_metrics(metrics, context.namespace)
+    end
+
+    test "gauge metric is set via the prometheus gauge API", context do
+      metric =
+        MetricCollector.gauge_metric(56_789_456, context.metric_name, context.metric_dimensions)
+
+      {:ok, []} = MetricCollector.record_metrics([metric], context.namespace)
+
+      assert 56_789_456 ==
+               Gauge.value(
+                 name: context.prometheus_metric_name,
+                 labels: Keyword.values(context.metric_dimensions)
+               )
+    end
+
+    test "mixed metrics are recorded via their respective APIs", context do
+      count_metric =
+        MetricCollector.count_metric(1, context.metric_name, context.metric_dimensions)
+
+      gauge_metric =
+        MetricCollector.gauge_metric(32.3333, context.metric_name, context.metric_dimensions)
+
+      {:ok, []} = MetricCollector.record_metrics([gauge_metric, count_metric], context.namespace)
+
+      assert 1 ==
+               Counter.value(
+                 name: context.prometheus_metric_name,
+                 labels: Keyword.values(context.metric_dimensions)
+               )
+
+      assert 32.3333 ==
+               Gauge.value(
+                 name: context.prometheus_metric_name,
+                 labels: Keyword.values(context.metric_dimensions)
+               )
     end
   end
 
